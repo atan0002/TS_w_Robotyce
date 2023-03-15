@@ -15,9 +15,11 @@ class ManiuplatorModel:
         self.m3 = 0.0
         self.r3 = 0.01
         self.I_3 = 2. / 5 * self.m3 * self.r3 ** 2
-        self.alpha=self.m1*self.r1*self.r1+self.I_1+self.m2*(self.l1*self.l1+self.r2*self.r2) + self.I_2
-        self.beta=self.m2*self.l1*self.r2
-        self.gamma=self.m2*self.r2*self.r2+self.I_2
+        self.d1=self.l1/2
+        self.d2=self.l2/2
+        self.alpha=self.m1*self.d1*self.d1+self.I_1+self.m2*(self.l1*self.l1+self.d2*self.d2) + self.I_2
+        self.beta=self.m2*self.l1*self.d2
+        self.gamma=self.m2*self.d2*self.d2+self.I_2
         
 
     def M(self, x):
