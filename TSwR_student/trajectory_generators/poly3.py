@@ -11,10 +11,12 @@ class Poly3(TrajectoryGenerator):
         Please implement the formulas for a_0 till a_3 using self.q_0 and self.q_k
         Assume that the velocities at start and end are zero.
         """
-        self.a_0 = self.q_0
-        self.a_1 = self.q_0 /3 #pochodna
-        self.a_2 = 1
-        self.a_3 = 1
+        self.q_0_dot=0
+        self.q_k_dot=0
+        self.a_0 = self.q_k
+        self.a_1 = self.q_0_dot+3*self.q_k
+        self.a_2 = 3*self.q_0 -self.q_k_dot
+        self.a_3 = self.q_0 
 
     def generate(self, t):
         """
@@ -25,7 +27,7 @@ class Poly3(TrajectoryGenerator):
         """
         t /= self.T
         q = self.a_3 * t**3 + self.a_2 * t**2 * (1 - t) + self.a_1 * t * (1 - t)**2 + self.a_0 * (1 - t)**3
-        q_dot = t*(3*self.a_0*t-3*self.a_1*t+2*self.a_1)+self.a_2*(3*t**3-4*t+1)-3*self.a_3*(1-t)**2 #3*self.a_3 * t**2 +self.a_2 * (2*t-3*t**2)+ self.a_1*(1-4*t+3*t**2)+ self.a_0*(-3)*(t-1)**2
-        q_ddot = 6*self.a_0*t-6*self.a_1*t+2*self.a_1+6*self.a_2*t-4*self.a_2-6*self.a_3*t+6*self.a_3
+        q_dot = t*(3*self.a_3*t-3*self.a_2*t+2*self.a_2)+self.a_1*(3*t**2-4*t+1)-3*self.a_0*(1-t)**2 #3*self.a_3 * t**2 +self.a_2 * (2*t-3*t**2)+ self.a_1*(1-4*t+3*t**2)+ self.a_0*(-3)*(t-1)**2
+        q_ddot = 6*self.a_3*t-6*self.a_2*t+2*self.a_2+6*self.a_1*t-4*self.a_1-6*self.a_0*t+6*self.a_0
 
         return q, q_dot / self.T, q_ddot / self.T**2
