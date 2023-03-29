@@ -55,24 +55,25 @@ class ManiuplatorModel:
         return C
 
 
-    def esitmate(self,x,q_r_ddot):
+    def esitmate(self,x,u):
 
         q = x[:2]
         q_dot = x[2:]
         # x=x.reshape(4,1)
         M=self.M(x)
         C=self.C(x)
+        
 
-        q_r_ddot=q_r_ddot.reshape(2,1)
-        q_dot=q_dot.reshape(2,1)
-        tau=self.M(x)@q_r_ddot+self.C(x)@q_dot
+        # q_r_ddot=q_r_ddot.reshape(2,1)
+        # q_dot=q_dot.reshape(2,1)
+        # tau=self.M(x)@q_r_ddot+self.C(x)@q_dot
 
         
 
         M_inv=np.linalg.inv(self.M(x))
-        test=M_inv@self.C(x)
-        test2=M_inv@tau
-        x_est=M_inv@tau-M_inv@self.C(x)@q_dot
+        # test=M_inv@self.C(x)
+        # test2=M_inv@u
+        x_est=M_inv@u.reshape(2,1)-M_inv@self.C(x)@q_dot.reshape(2,1)
         
 
         return x_est

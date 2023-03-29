@@ -31,18 +31,19 @@ class MMAController(Controller):
         self.i = 0
 
         self.ksi=1.0
-        self.omega_c=15.0
+        self.omega_c=25.0
         self.kd=2*self.ksi*self.omega_c
         self.kp=self.omega_c**2
+        self.u=np.array([0,0])
 
-    def choose_model(self, x,q_r_ddot):
+    def choose_model(self, x):
         # TODO: Implement procedure of choosing the best fitting model from self.models (by setting self.i)
 
        
         q_dot = x[2:]
-        x1=self.model_1.esitmate(x,q_r_ddot)
-        x2=self.model_2.esitmate(x,q_r_ddot)
-        x3=self.model_3.esitmate(x,q_r_ddot)
+        x1=self.model_1.esitmate(x,self.u)
+        x2=self.model_2.esitmate(x,self.u)
+        x3=self.model_3.esitmate(x,self.u)
 
         states_errors=[q_dot-x1,q_dot-x2,q_dot-x3]
 
@@ -57,14 +58,19 @@ class MMAController(Controller):
         
 
         self.i=min_index
+        
 
 
     def calculate_control(self, x, q_r, q_r_dot, q_r_ddot):
-        self.choose_model(x,q_r_ddot)
+        self.choose_model(x)
+        print(self.i)
         q = x[:2]
         q_dot = x[2:]
-        v = q_r_ddot.reshape(2,1)+self.kd*(q_r_dot.reshape(2,1)-q_dot)+self.kp*(q_r.reshape(2,1)-q)
+        q_dot=q_dot.reshape(2,1)
+        v = q_r_ddot.reshape(2,1)+self.kd*(q_r_dot.reshape(2,1)-q_dot.reshape(2,1))+self.kp*(q_r.reshape(2,1)-q.reshape(2,1))
+        # v=v.reshape(2,1)
         M = self.models[self.i].M(x)
         C = self.models[self.i].C(x)
-        u = M @ v[:, np.newaxis] + C @ q_dot[:, np.newaxis]
+        u = M @ v.reshape(2,1) + C @ q_dot
+        self.u=u
         return u
