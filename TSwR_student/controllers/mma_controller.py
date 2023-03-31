@@ -31,7 +31,7 @@ class MMAController(Controller):
         self.i = 0
 
         self.ksi=1.0
-        self.omega_c=25.0
+        self.omega_c=50.0
         self.kd=2*self.ksi*self.omega_c
         self.kp=self.omega_c**2
         self.u=np.array([0,0])
