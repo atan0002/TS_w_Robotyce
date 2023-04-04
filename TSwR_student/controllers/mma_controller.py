@@ -45,7 +45,7 @@ class MMAController(Controller):
         x2=self.model_2.esitmate(x,self.u)
         x3=self.model_3.esitmate(x,self.u)
 
-        states_errors=[q_dot-x1,q_dot-x2,q_dot-x3]
+        states_errors=[np.absolute(q_dot-x1),np.absolute(q_dot-x2),np.absolute(q_dot-x3)]
 
         min_value=0    
         min_index=0
@@ -63,7 +63,7 @@ class MMAController(Controller):
 
     def calculate_control(self, x, q_r, q_r_dot, q_r_ddot):
         self.choose_model(x)
-        print(self.i)
+        print(f'i {self.i}')
         q = x[:2]
         q_dot = x[2:]
         q_dot=q_dot.reshape(2,1)

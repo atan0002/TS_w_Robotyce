@@ -1,6 +1,7 @@
 import numpy as np
 from observers.eso import ESO
 from .controller import Controller
+from models.manipulator_model import ManiuplatorModel
 
 
 class ADRCJointController(Controller):
@@ -16,6 +17,9 @@ class ADRCJointController(Controller):
         W = np.array([0,1,0])
         self.eso = ESO(A, B, W, L, q0, Tp)
         self.u_n1=0
+       
+
+
 
     def set_b(self, b):
         self.b=b
@@ -23,8 +27,11 @@ class ADRCJointController(Controller):
 
     def calculate_control(self, x, q_d, q_d_dot, q_d_ddot):
 
-        q = x[:2]
-        q_dot = x[2:]
+
+        q = x[0]
+        q_dot = x[1]
+
+      
 
         states=self.eso.update(q,self.u_n1)
         

@@ -24,6 +24,7 @@ class ESO:
         self.state_n1=np.array([0.0,0.0,0.0])
         self.state_n1=self.state_n1.reshape(3,1)
         
+        
 
     def set_B(self, B):
         self.B = B
@@ -34,7 +35,7 @@ class ESO:
         self.state_n1=self.states[-1][:].reshape(3,1)
         
         
-        self.new_state=self.Ad@self.state_n1+self.Bd*u+self.Od*(q[0]-self.state_n1[0]) #
+        self.new_state=self.Ad@self.state_n1+self.Bd*u+self.Od*(q-self.state_n1[0]) #
 
 
 
