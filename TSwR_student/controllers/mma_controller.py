@@ -18,14 +18,17 @@ class MMAController(Controller):
         self.model_1=ManiuplatorModel(Tp)
         self.model_1.m3=0.1
         self.model_1.r3=0.05
+        self.model_1.update()
         #model 2
         self.model_2=ManiuplatorModel(Tp)
         self.model_2.m3=0.01
         self.model_2.r3=0.01
+        self.model_2.update()
         #model 3
         self.model_3=ManiuplatorModel(Tp)
         self.model_3.m3=1.0
         self.model_3.r3=0.3
+        self.model_3.update()
     
         self.models = [self.model_1, self.model_2, self.model_3]
         self.i = 0
@@ -39,15 +42,17 @@ class MMAController(Controller):
     def choose_model(self, x):
         # TODO: Implement procedure of choosing the best fitting model from self.models (by setting self.i)
 
-       
+        q = x[:2]
         q_dot = x[2:]
         x1=self.model_1.esitmate(x,self.u)
         x2=self.model_2.esitmate(x,self.u)
         x3=self.model_3.esitmate(x,self.u)
 
+        # print(self.model_2.m3)
+
         states_errors=[np.absolute(q_dot-x1),np.absolute(q_dot-x2),np.absolute(q_dot-x3)]
 
-        min_value=0    
+        min_value=states_errors[0]    
         min_index=0
         for i in range(0,len(states_errors)-1):
             

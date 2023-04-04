@@ -19,8 +19,6 @@ class ADRCJointController(Controller):
         self.u_n1=0
        
 
-
-
     def set_b(self, b):
         self.b=b
     
@@ -31,14 +29,8 @@ class ADRCJointController(Controller):
         q = x[0]
         q_dot = x[1]
 
-      
-
         states=self.eso.update(q,self.u_n1)
-        
         u_star=self.kd*(q_d_dot-states[1])+self.kp*(q_d-states[0])
-        
-        
-
         u=(u_star[-1]-states[2])/self.b
 
         self.u_n1=u[0]

@@ -18,7 +18,7 @@ traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.])
 # traj_gen = Poly3(np.array([0., 0.]), np.array([pi/4, pi/6]), end)
 
 omega_o=60
-omegac=0.3*omega_o
+omegac=0.22*omega_o
 ksi=1
 
 b_est_1 =2

@@ -11,7 +11,7 @@ class ManiuplatorModel:
         self.r2 = 0.04
         self.m2 = 2.4
        
-        self.m3 = 0.2
+        self.m3 = 0.1
         self.r3 = 0.05
       
         self.d1=self.l1/2
@@ -25,6 +25,11 @@ class ManiuplatorModel:
         self.beta=self.m2*self.l1*self.d2 + self.m3*((self.l2)*self.l1)
         self.gamma=self.m2*self.d2**2 +self.I_2+self.m3*(self.l2)**2+self.I_3
         
+    def update(self):
+        self.alpha=self.m1*self.d1**2+self.I_1+self.m2*(self.l1**2+self.d2**2) + self.I_2 + self.m3*(self.l1**2+(self.l2**2))+self.I_3
+        self.beta=self.m2*self.l1*self.d2 + self.m3*((self.l2)*self.l1)
+        self.gamma=self.m2*self.d2**2 +self.I_2+self.m3*(self.l2)**2+self.I_3
+
 
     def M(self, x):
         """
@@ -33,7 +38,7 @@ class ManiuplatorModel:
         """
         q1, q2, q1_dot, q2_dot = x
 
-        #Macierz  dla manipulatora bez m3
+        #Macierz  dla manipulatora z m3
         M = np.array([[self.alpha+2*self.beta*np.cos(q2), self.gamma+self.beta*np.cos(q2) ],[self.gamma+self.beta*np.cos(q2), self.gamma]])
         
 
@@ -64,15 +69,9 @@ class ManiuplatorModel:
         C=self.C(x)
         
 
-        # q_r_ddot=q_r_ddot.reshape(2,1)
-        # q_dot=q_dot.reshape(2,1)
-        # tau=self.M(x)@q_r_ddot+self.C(x)@q_dot
-
-        
 
         M_inv=np.linalg.inv(self.M(x))
-        # test=M_inv@self.C(x)
-        # test2=M_inv@u
+      
         x_est=M_inv@u.reshape(2,1)-M_inv@self.C(x)@q_dot.reshape(2,1)
         
 
