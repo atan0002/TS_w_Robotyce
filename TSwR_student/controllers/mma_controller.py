@@ -59,6 +59,11 @@ class MMAController(Controller):
             if (np.minimum(states_errors[i],states_errors[i+1])< min_value).all():
                 
                 min_index=i
+                min_value=states_errors[i]
+
+            if(min_value>states_errors[2]).all():
+                min_index=2
+
                      
         
 
