@@ -12,49 +12,71 @@ class ADRFLController(Controller):
     def __init__(self, Tp, q0, Kp, Kd, p):
         self.manipulator=ManiuplatorModel(Tp)
         self.model = None
-        self.Kp = Kp
-        self.Kd = Kd
-        self.I=np.ones(2,2)#np.array([[self.manipulator.I_1,self.manipulator.I_3],[0,self.manipulator.I_2]])
-        self.L = None
-        self.W = np.array([self.I,np.zeros(2,4)]).reshape(6,2)
-        self.A = None#np.array([[np.zeros(2,2),self.I,np.zeros(2,2)],[np.zeros(2,2),-self.manipulator.M]])
-        self.B = None
-        self.eso = ESO(self.A, self.B, self.W, self.L, q0, Tp)
+        self.Kp = np.array([Kp[0,0],Kp[1,1]])
+        self.Kd = np.array([Kd[0,0],Kd[1,1]])
         self.omega=p
-        self.update_params(q0[:2], q0[2:])
         self.Tp=Tp
-        self.x_est_n1=np.zeros(6,1)
-        self.u=np.zeros(2,1)
+        self.I=np.eye(2)#np.array([[self.manipulator.I_1,self.manipulator.I_3],[0,self.manipulator.I_2]])
+        self.L = np.array([
+            [3*self.omega[0],0],
+            [0,3*self.omega[1]],
+            [3*self.omega[0]**2,0],
+            [0,3*self.omega[1]**2],
+            [self.omega[0]**3,0],
+            [0,self.omega[1]**3]
+            
+            ])
+
+        self.Od=self.Tp*self.L
+        zer=np.zeros((4,2))
+        self.W = np.concatenate((self.I,zer),axis=0)
+        self.W=self.W.reshape(6,2)
+        self.A = None
+        self.B = None
+        
+        
+        
+        self.states = np.empty((0,6))
+        state=np.zeros((1,6))
+        self.states=np.append(self.states,state,axis=0)
+    
+        q=np.array([0.0,0.0])
+        q_dot=np.array([0.0,0.0])
+        self.update_params(q, q_dot)
+        self.Tp=Tp
+        self.x_est_n1=np.zeros((6,1))
+        self.u=np.zeros((2,1))
         self.model_est=ManiuplatorModel(Tp)
-        self.omegac=30
-        self.ksi=1
-        self.Kp = self.omegac**2
-        self.Kd = 2*self.ksi*self.omegac
+      
 
 
     def update_params(self, q, q_dot):
-        ### TODO Implement procedure to set eso.A and eso.B
+       
         x=np.array([q,q_dot])
-        M_inv=np.linalg.inv(self.manipulator.M(x))
+        x=x.reshape(4,1)
+        M=self.manipulator.M(x)
+        M_inv=np.linalg.inv(M)
         N=-M_inv@self.manipulator.C(x)
     
-        self.l1= N[0,0]/2+N[1,1]/2+3*self.omega
-        self.l3=(N[0,0]**3*self.I[0,1] - N[0,0]**2*N[0,1]*self.I[0,0] + 6*N[0,0]**2*self.I,[0,1]*self.omega + 
-                 2*N[0,0]*N[0,1]*N[1,0]*self.I[0,1] - N[0,0]*N[0,1]*N[1,1]*self.I[0,0] - 6*N[0,0]*N[0,1]*self.I[0,0]*self.omega + 
-                 15*N[0,0]*self.I[0,1]*self.omega**2 - N[0,1]**2*N[1,0]*self.I[0,0] + N[0,1]*N[1,0]*N[1,1]*self.I[0,1] + 6*N[0,1]*N[1,0]*self.I[0,1]*self.omega - 
-                 N[0,1]*N[1,1]**2*self.I[0,0] - 6*N[0,1]*N[1,1]*self.I[0,0]*self.omega - 15*N[0,1]*self.I[0,0]*self.omega**2 + 20*self.I[0,1]*self.omega**3)/(2*N[0,0]*self.I[0,0]*self.I[0,1] - 2*N[0,1]*self.I[0,0]**2 + 2*N[1,0]*self.I[0,1]**2 - 2*N[1,1]*self.I[0,0]*self.I[0,1])
-        
-        self.l4=(N[0,0]**2*N[1,0]*self.I[0,1] - N[0,0]*N[0,1]*N[1,0]*self.I[0,0] + N[0,0]*N[1,0]*N[1,1]*self.I[0,1] + 6*N[0,0]*N[1,0]*self.I01*self.omega + N[0,1]*N[1,0]**2*self.I[0,1] - 
-                 2*N[0,1]*N[1,0]*N[1,1]*self.I[0,0] - 6*N[0,1]*N[1,0]*self.I[0,0]*self.omega + N[1,0]*N[1,1]**2*self.I[0,1] + 
-                 6*N[1,0]*N[1,1]*self.I[0,1]*self.omega + 15*N[1,0]*self.I[0,1]*self.omega**2 - N[1,1]**3*self.I[0,0] - 6*N[1,1]**2*self.I[0,0]*self.omega -
-                   15*N[1,1]*self.I[0,0]*self.omega**2 - 20*self.I[0,0]*self.omega**3)/(2*N[0,0]*self.I[0,0]*self.I[0,1] - 2*N[0,1]*self.I[0,0]**2 + 2*N[1,0]*self.I[0,1]**2 - 2*N[1,1]*self.I[0,0]*self.I[0,1])
-        
-       
-        self.L=np.array([self.l1,self.l1],[0,0],[self.l3,self.l3],[self.l4,self.l4],[0,0],[0,0])
 
-        self.eso.A = np.array([[np.zeros(2,2),self.I,np.zeros(2,2)],[np.zeros(2,2),-M_inv@self.manipulator.C(x),self.I],
-                               [np.zeros(2,2),np.zeros(2,2),np.zeros(2,2)]])
-        self.eso.B = self.array([np.zeros(2,2),M_inv,np.zeros(2,2)])
+        self.A = np.array([[np.zeros((2,2)),self.I,np.zeros((2,2))],[np.zeros((2,2)),-M_inv@self.manipulator.C(x),self.I],
+                               [np.zeros((2,2)),np.zeros((2,2)),np.zeros((2,2))]])
+
+        self.A= np.array([[0,0,1,0,0,0],
+                          [0,0,0,1,0,0],
+                          [0,0,N[0,0],N[0,1],1,0],
+                          [0,0,N[1,0],N[1,1],0,1],
+                          [0,0,0,0,0,0],
+                          [0,0,0,0,0,0]
+                          ])
+
+        self.B=np.array([[0,0],
+                         [0,0],
+                         [M_inv[0,0],M_inv[0,1]],
+                         [M_inv[1,0],M_inv[1,1]],
+                         [0,0],
+                         [0,0]                         
+                         ])
 
     def calculate_control(self, x, q_d, q_d_dot, q_d_ddot):
 
@@ -63,18 +85,26 @@ class ADRFLController(Controller):
         
         self.Ad=np.eye(6)+self.Tp*self.A
         self.Bd=self.Tp*self.B
-        self.Od=self.Tp*self.L
-        
+       
+      
 
+        x_est=self.Ad@self.x_est_n1+self.Bd@self.u+self.Od@(q-self.W.reshape(2,6)@self.x_est_n1)
 
-        x_est=self.Ad@self.x_est_n1+self.Bd*self.u+self.Od*(q-self.W@self.x_est_n1)
+        v=self.Kp.reshape(2,1)*(q_d.reshape(2,1)-q.reshape(2,1))+ self.Kd.reshape(2,1)*(q_d_dot.reshape(2,1)-q_dot.reshape(2,1))+q_d_ddot.reshape(2,1)
 
-        v=self.Kp*(q_d.reshape(2,1)-q)+ self.Kd*(q_d_dot.reshape(2,1)-q_dot)+q_d_ddot
+        x_ev=np.array([x_est[0,0],x_est[1,1],x_est[2,0],x_est[3,1]])
+        f_est=np.array([x_est[4,0],x_est[5,1]])
+        q_est_dot=x_ev[2:]
 
+        # test=self.model_est.M(x_ev)@(v.reshape(2,1)-f_est.reshape(2,1))
+        # test1=self.model_est.C(x_ev)@q_est_dot.reshape(2,1)
 
-        u=self.model_est.M(x_est)@(v-x_est[4:])+self.model_est.C(x_est)@x_est[2:4]
+        u=self.model_est.M(x_ev)@(v.reshape(2,1)-f_est.reshape(2,1))+self.model_est.C(x_ev)@q_est_dot.reshape(2,1)
 
+        self.update_params(x_ev[:2],x_ev[2:4])
 
-        self.update_params(x_est[:2],x_est[2:4])
+        state=np.concatenate((x_ev.reshape(1,4), f_est.reshape(1,2)),axis=1)
+
+        self.states=np.append(self.states,state,axis=0)
         
         return u

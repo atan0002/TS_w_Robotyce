@@ -10,17 +10,24 @@ Tp = 0.001
 end = 5
 
 # traj_gen = ConstantTorque(np.array([0., 1.0])[:, np.newaxis])
-traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.]))
-# traj_gen = Poly3(np.array([0., 0.]), np.array([pi/4, pi/6]), end)
+#traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.]))
+traj_gen = Poly3(np.array([0., 0.]), np.array([np.pi/4, np.pi/6]), end)
+omega=30
+p1 = omega
+p2 = omega
 
-b_est_1 = None
-b_est_2 = None
-kp_est_1 = None
-kp_est_2 = None
-kd_est_1 = None
-kd_est_2 = None
-p1 = None
-p2 = None
+omegac=0.8*omega
+ksi=1
+Kp = omegac**2
+Kd = 2*ksi*omegac
+
+
+b_est_1 = 2
+b_est_2 = 25
+kp_est_1 = Kp
+kp_est_2 = Kp
+kd_est_1 = Kd
+kd_est_2 = Kd
 
 q0, qdot0, _ = traj_gen.generate(0.)
 q1_0 = np.array([q0[0], qdot0[0]])
@@ -35,19 +42,19 @@ controller = ADRFLController(Tp, np.concatenate([q0, qdot0]), Kp, Kd, p)
 
 Q, Q_d, u, T = simulate("PYBULLET", traj_gen, controller, Tp, end)
 
-eso = np.array(controller.eso.states)
+eso = np.array(controller.states)
 
 plt.subplot(221)
-plt.plot(T, eso[:, 0])
+plt.plot(T, eso[0:-1, 0])
 plt.plot(T, Q[:, 0], 'r')
 plt.subplot(222)
-plt.plot(T, eso[:, 2])
+plt.plot(T, eso[0:-1, 2])
 plt.plot(T, Q[:, 2], 'r')
 plt.subplot(223)
-plt.plot(T, eso[:, 1])
+plt.plot(T, eso[0:-1, 1])
 plt.plot(T, Q[:, 1], 'r')
 plt.subplot(224)
-plt.plot(T, eso[:, 3])
+plt.plot(T, eso[0:-1, 3])
 plt.plot(T, Q[:, 3], 'r')
 plt.show()
 

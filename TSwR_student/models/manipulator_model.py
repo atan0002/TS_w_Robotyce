@@ -39,8 +39,9 @@ class ManiuplatorModel:
         """
         q1, q2, q1_dot, q2_dot = x
 
+
         #Macierz  dla manipulatora z m3
-        M = np.array([[self.alpha+2*self.beta*np.cos(q2), self.gamma+self.beta*np.cos(q2) ],[self.gamma+self.beta*np.cos(q2), self.gamma]])
+        M = np.array([[float(self.alpha+2*self.beta*np.cos(q2)), float(self.gamma+self.beta*np.cos(q2)) ],[float(self.gamma+self.beta*np.cos(q2)), float(self.gamma)]])
         
 
 
@@ -55,7 +56,7 @@ class ManiuplatorModel:
 
         #macierz C dla manipulatora bez m3
 
-        C=np.array([[-self.beta*np.sin(q2)*q2_dot,-self.beta*np.sin(q2)*(q1_dot+q2_dot)],[self.beta*np.sin(q2)*q1_dot,0]])
+        C=np.array([[float(-self.beta*np.sin(q2)*q2_dot),float(-self.beta*np.sin(q2)*(q1_dot+q2_dot))],[float(self.beta*np.sin(q2)*q1_dot),0.0]])
         
         
         return C

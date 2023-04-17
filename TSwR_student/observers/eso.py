@@ -30,19 +30,16 @@ class ESO:
         self.B = B
 
     def update(self, q, u):
-        # stat=self.states[-1][:]
-        # stat=stat.reshape(3,1)
+   
         self.state_n1=self.states[-1][:].reshape(3,1)
         
         
-        self.new_state=self.Ad@self.state_n1+self.Bd*u+self.Od*(q-self.state_n1[0]) #
-
-
+        self.new_state=self.Ad@self.state_n1+self.Bd*u+self.Od*(q-self.state_n1[0]) 
 
         self.states=np.append(self.states,self.new_state.reshape(1,3),axis=0)
 
         self.state_n1=self.new_state
-        # self.states.append(copy(self.new_state))
+     
         
         return self.new_state 
 
