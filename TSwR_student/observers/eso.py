@@ -8,6 +8,7 @@ class ESO:
         self.B = B
         self.W = W
         self.L = L
+        #dyskretyzacja równań stanu Eulerem w przód
         self.Ad=np.eye(3)+Tp*self.A
         self.Bd=Tp*self.B
         self.Od=Tp*self.L
