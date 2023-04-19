@@ -36,9 +36,9 @@ class ADRFLController(Controller):
         
         
         
-        self.states = np.empty((0,6))
-        state=np.zeros((1,6))
-        self.states=np.append(self.states,state,axis=0)
+        self.states =  np.empty((0,6))
+        state=np.array([q0[0],q0[1],q0[2],q0[3],0,0])
+        self.states=np.append(self.states,state.reshape(1,6),axis=0)
     
         q=np.array([0.0,0.0])
         q_dot=np.array([0.0,0.0])
@@ -47,6 +47,8 @@ class ADRFLController(Controller):
         self.x_est_n1=np.zeros((6,1))
         self.u=np.zeros((2,1))
         self.model_est=ManiuplatorModel(Tp)
+        self.y=self.x_est_n1[:2]
+        self.y=self.y.reshape(2,1)
       
 
 
@@ -86,33 +88,42 @@ class ADRFLController(Controller):
         
         self.Ad=np.eye(6)+self.Tp*self.A
         self.Bd=self.Tp*self.B
-    
 
-        y=self.x_est_n1[:2].reshape(2,1)
+
+      
+
 
         
 
-        x_est=self.Ad@self.x_est_n1+self.Bd@self.u+self.Od@(q.reshape(2,1)-y)
+        x_est=self.Ad@self.x_est_n1+self.Bd@self.u+self.Od@(q.reshape(2,1)-self.y)
 
         v=self.Kp.reshape(2,1)*(q_d.reshape(2,1)-q.reshape(2,1))+ self.Kd.reshape(2,1)*(q_d_dot.reshape(2,1)-q_dot.reshape(2,1))+q_d_ddot.reshape(2,1)
 
-        # x_ev=np.array([x_est[0,0],x_est[1,1],x_est[2,0],x_est[3,1]])
+        #wybuch estymat trzeba przeczekać ten wybuch
+        if not (-100<x_est[-1]<100):
+            x_est=np.array([float(x_est[0]),float(x_est[1]),0.0,0.0,0.0,0.0])
+            x_est=x_est.reshape(6,1)
+       
         f_est=x_est[4:]
         q_est_dot=x_est[2:4]
 
-        # test=self.model_est.M(x_ev)@(v.reshape(2,1)-f_est.reshape(2,1))
-        # test1=self.model_est.C(x_ev)@q_est_dot.reshape(2,1)
+      
 
         u=self.model_est.M(x_est[:4])@(v.reshape(2,1)-f_est.reshape(2,1))+self.model_est.C(x_est[:4])@q_est_dot.reshape(2,1)
 
         self.update_params(x_est[:2],x_est[2:4])
 
-        # state=np.concatenate((x_est),axis=1)#x_ev.reshape(1,4), f_est.reshape(1,2)
 
         self.states=np.append(self.states,x_est.reshape(1,6),axis=0)
+
+       
+
+        self.y=x_est[:2].reshape(2,1)
         self.x_est_n1=x_est.reshape(6,1)
+        
+        
         self.u=u.reshape(2,1)
 
-        # u=np.array([[u[0],0],[0,u[1]]])
+
         
         return u
