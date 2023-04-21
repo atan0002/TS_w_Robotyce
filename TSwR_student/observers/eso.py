@@ -18,7 +18,7 @@ class ESO:
         self.state = np.pad(np.array(state), (0, A.shape[0] - len(state)))
         self.Tp = Tp
         self.states = np.empty((0,3))
-        state=np.array([state[0],state[1],0])
+        state=np.array([float(state[0]),float(state[1]),0])
         state=state.reshape(1,3)
         self.states=np.append(self.states,state,axis=0)
 

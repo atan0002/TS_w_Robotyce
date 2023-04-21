@@ -9,9 +9,9 @@ from utils.simulation import simulate
 Tp = 0.001
 end = 5
 
-# traj_gen = ConstantTorque(np.array([0., 1.0])[:, np.newaxis])
+traj_gen = ConstantTorque(np.array([0., 1.0])[:, np.newaxis])
 # traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.]))
-traj_gen = Poly3(np.array([0., 0.]), np.array([np.pi/4, np.pi/6]), end)
+# traj_gen = Poly3(np.array([0., 0.]), np.array([np.pi/4, np.pi/6]), end)
 omega=100
 p1 = omega
 p2 = omega

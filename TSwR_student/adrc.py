@@ -13,9 +13,12 @@ from utils.simulation import simulate
 Tp = 0.001
 end = 5
 
-# traj_gen = ConstantTorque(np.array([0., 1.0])[:, np.newaxis])
+#b_est zmienne jest zakodowane, ale doszłam do wniosku, że  układ wytraca stabilność dla sinusa przy dyskretyzacji równań stanu Eulerem w przod, wiec zostało zakomentowane
+#można je odkomentowac w pliku adrc_controller.py
+
+traj_gen = ConstantTorque(np.array([0., 1.0])[:, np.newaxis])
 # traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.]))
-traj_gen = Poly3(np.array([0., 0.]), np.array([pi/4, pi/6]), end)
+# traj_gen = Poly3(np.array([0., 0.]), np.array([pi/4, pi/6]), end)
 
 omega_o=60
 omegac=0.22*omega_o

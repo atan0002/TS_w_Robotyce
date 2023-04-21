@@ -37,7 +37,7 @@ class ADRFLController(Controller):
         
         
         self.states =  np.empty((0,6))
-        state=np.array([q0[0],q0[1],q0[2],q0[3],0,0])
+        state=np.array([float(q0[0]),float(q0[1]),float(q0[2]),float(q0[3]),0,0])
         self.states=np.append(self.states,state.reshape(1,6),axis=0)
     
         q=np.array([0.0,0.0])

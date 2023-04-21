@@ -13,7 +13,7 @@ from utils.simulation import simulate
 
 """http://www.gipsa-lab.fr/~ioandore.landau/adaptivecontrol/Transparents/Courses/AdaptiveCourse5GRK.pdf"""
 
-Tp = 0.01
+Tp = 0.005
 end = 10.
 
 
@@ -25,8 +25,8 @@ controller = MMAController(Tp)
 """
 Here you have some trajectory generators. You can use them to check your implementations.
 """
-# traj_gen = ConstantTorque(np.array([0., 1.0])[:, np.newaxis])
-traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.]))
+traj_gen = ConstantTorque(np.array([0., 1.0])[:, np.newaxis])
+# traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.]))
 # traj_gen = Poly3(np.array([0., 0.]), np.array([pi/4, pi/6]), end)
 
 

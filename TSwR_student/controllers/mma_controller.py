@@ -54,15 +54,15 @@ class MMAController(Controller):
 
         min_value=states_errors[0]    
         min_index=0
-        for i in range(0,len(states_errors)-1):
+        for i in range(0,len(states_errors)):
             
-            if (np.minimum(states_errors[i],states_errors[i+1])< min_value).all():
+            if np.less(states_errors[i],min_value).all():
+
+                test=np.less(states_errors[i],min_value)
                 
                 min_index=i
                 min_value=states_errors[i]
 
-            if(min_value>states_errors[2]).all():
-                min_index=2
 
                      
         
